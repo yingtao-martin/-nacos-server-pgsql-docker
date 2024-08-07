@@ -1,174 +1,132 @@
-# Nacos Docker
+# Nacos 的PostgreSQL版本
 
-![Docker Pulls](https://img.shields.io/docker/pulls/nacos/nacos-server.svg?maxAge=60480)
+---
 
-This project contains a Docker image meant to facilitate the deployment of [Nacos](https://github.com/alibaba/nacos).
-
-[**中文**](README_ZH.md)
-
-## Note
-
-The following environment variables have been **removed** from the default values in the new version(**Nacos 2.2.1**)
-for the sake of **system security**, please add them yourself when starting up, otherwise an error will be reported at
-startup.
-
-1. ~~NACOS_AUTH_IDENTITY_KEY~~
-2. ~~NACOS_AUTH_IDENTITY_VALUE~~
-3. ~~NACOS_AUTH_TOKEN~~
-
-## Project directory
-
-* build：Nacos makes the source code of the docker image
-* env: Environment variable file for compose yaml
-* example: Docker compose example for Nacos server
-
-## Precautions
-
-* The **database master-slave image** has been removed, after the latest `nacos/nacos-server:latest` image. For specific
-  reasons, refer
-  to [Removing the Master-Slave Image Configuration](https://github.com/nacos-group/nacos-docker/wiki/%E7%A7%BB%E9%99%A4%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%BB%E4%BB%8E%E9%95%9C%E5%83%8F%E9%85%8D%E7%BD%AE)
-* Since Nacos 1.3.1 version, the database storage has been upgraded to 8.0, and it is backward compatible
-* If you use a custom database, you need to initialize
-  the [database script](https://github.com/alibaba/nacos/blob/master/distribution/conf/mysql-schema.sql) yourself for
-  the first time.
-
-## Quick Start
+当前pull:
 
 ```shell
-docker run --name nacos-quick -e MODE=standalone -p 8848:8848 -p 9848:9848 -d nacos/nacos-server:v2.2.0
+docker pull yangxj96/nacos-server-pgsql:v2.3.2
 ```
 
-## Advanced Usage
+或
 
-* Tips: You can change the version of the Nacos image in the compose file from the following configuration.
-  `example/.env`
-
-```dotenv
-NACOS_VERSION=v2.2.0
+```shell
+docker pull ghcr.io/yangxj96/nacos-server-pgsql:v2.3.2
 ```
 
-Run the following command：
 
-* Clone project
+---
+[原版Nacos链接](https://hub.docker.com/r/nacos/nacos-server)
 
-  ```powershell
-  git clone --depth 1 https://github.com/nacos-group/nacos-docker.git
-  cd nacos-docker
-  ```
+具体的变量内容查看原版即可,只是我这边新增了几个变量 
 
+用于适配PostgreSQL数据库
 
-* Standalone Derby
+构建脚本是从[Nacos Docker](https://github.com/nacos-group/nacos-docker)克隆后
 
-  ```powershell
-  docker-compose -f example/standalone-derby.yaml up
-  ```
-* Standalone Mysql
+在build文件夹下的构建脚本构建的.进行过一些修改
 
-  ```powershell
-  # Using mysql 5.7
-  docker-compose -f example/standalone-mysql-5.7.yaml up
+数据库插件来自[官方收录的仓库中下载](https://github.com/nacos-group/nacos-plugin)
 
-  # Using mysql 8
-  docker-compose -f example/standalone-mysql-8.yaml up
-  ```
+[当前镜像构建脚本仓库链接](https://github.com/yangxj96/nacos-server-pgsql-docker)
 
-* Standalone Nacos Cluster
+---
 
-  ```powershell
-  docker-compose -f example/cluster-hostname.yaml up 
-  ```
+## 一 新增的环境变量
 
+| 变量名            | 说明       | 示例                                                       |
+|:---------------|:---------|:---------------------------------------------------------|
+| PGSQL_URL      | JDBC URL | jdbc:postgresql://localhost:5432/db?currentSchema=schema |
+| PGSQL_USERNAME | 数据库用户名   | postgres                                                 |
+| PGSQL_PASSWORD | 数据库密码    | postgres                                                 |
 
-* Service registration
+## 二 docker-compose运行示例
 
-  ```powershell
-  curl -X POST 'http://127.0.0.1:8848/nacos/v1/ns/instance?serviceName=nacos.naming.serviceName&ip=20.18.7.10&port=8080'
+#### docker-compose 文件
 
-  ```
-
-* Service discovery
-
-    ```powershell
-    curl -X GET 'http://127.0.0.1:8848/nacos/v1/ns/instance/list?serviceName=nacos.naming.serviceName'
-    ```
-
-* Publish config
-
-  ```powershell
-  curl -X POST "http://127.0.0.1:8848/nacos/v1/cs/configs?dataId=nacos.cfg.dataId&group=test&content=helloWorld"
-  ```
-
-* Get config
-
-  ```powershell
-    curl -X GET "http://127.0.0.1:8848/nacos/v1/cs/configs?dataId=nacos.cfg.dataId&group=test"
-  ```
-
-
-* Open the Nacos console in your browser
-
-  link：http://127.0.0.1:8848/nacos/
-
-## Common property configuration
-
-| name                                    | description                                                                                                                       | option                                                                                                                                                                                |
-|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| MODE                                    | cluster/standalone                                                                                                                | cluster/standalone default **cluster**                                                                                                                                                |
-| NACOS_SERVERS                           | nacos cluster address                                                                                                             | eg. ip1:port1 ip2:port2 ip3:port3                                                                                                                                                     |
-| PREFER_HOST_MODE                        | Whether hostname are supported                                                                                                    | hostname/ip default **ip**                                                                                                                                                            |
-| NACOS_APPLICATION_PORT                  | nacos server port                                                                                                                 | default **8848**                                                                                                                                                                      |
-| NACOS_SERVER_IP                         | custom nacos server ip when network was mutil-network                                                                             |                                                                                                                                                                                       |
-| SPRING_DATASOURCE_PLATFORM              | standalone support mysql                                                                                                          | mysql / empty default empty                                                                                                                                                           |
-| MYSQL_SERVICE_HOST                      | mysql  host                                                                                                                       |                                                                                                                                                                                       |
-| MYSQL_SERVICE_PORT                      | mysql  database port                                                                                                              | default : **3306**                                                                                                                                                                    |
-| MYSQL_SERVICE_DB_NAME                   | mysql  database name                                                                                                              |                                                                                                                                                                                       |
-| MYSQL_SERVICE_USER                      | username of  database                                                                                                             |                                                                                                                                                                                       |
-| MYSQL_SERVICE_PASSWORD                  | password of  database                                                                                                             |                                                                                                                                                                                       |
-| MYSQL_DATABASE_NUM                      | It indicates the number of database                                                                                               | default :**1**                                                                                                                                                                        |
-| MYSQL_SERVICE_DB_PARAM                  | Database url parameter                                                                                                            | default :**characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false**                                                                            |
-| JVM_XMS                                 | -Xms                                                                                                                              | default :1g                                                                                                                                                                           |
-| JVM_XMX                                 | -Xmx                                                                                                                              | default :1g                                                                                                                                                                           |
-| JVM_XMN                                 | -Xmn                                                                                                                              | default :512m                                                                                                                                                                         |
-| JVM_MS                                  | -XX:MetaspaceSize                                                                                                                 | default :128m                                                                                                                                                                         |
-| JVM_MMS                                 | -XX:MaxMetaspaceSize                                                                                                              | default :320m                                                                                                                                                                         |
-| NACOS_DEBUG                             | enable remote debug                                                                                                               | y/n default :n                                                                                                                                                                        |
-| TOMCAT_ACCESSLOG_ENABLED                | server.tomcat.accesslog.enabled                                                                                                   | default :false                                                                                                                                                                        |
-| NACOS_AUTH_SYSTEM_TYPE                  | The auth system to use, currently only 'nacos' is supported                                                                       | default :nacos                                                                                                                                                                        |
-| NACOS_AUTH_ENABLE                       | If turn on auth system                                                                                                            | default :false                                                                                                                                                                        |
-| NACOS_AUTH_TOKEN_EXPIRE_SECONDS         | The token expiration in seconds                                                                                                   | default :18000                                                                                                                                                                        |
-| NACOS_AUTH_TOKEN                        |                                                                                                                                   | `Note: It is removed from Nacos 2.2.1`                                                                                                                                                |
-| NACOS_AUTH_CACHE_ENABLE                 | Turn on/off caching of auth information. By turning on this switch, the update of auth information would have a 15 seconds delay. | default : false                                                                                                                                                                       |
-| MEMBER_LIST                             | Set the cluster list with a configuration file or command-line argument                                                           | eg:192.168.16.101:8847?raft_port=8807,192.168.16.101?raft_port=8808,192.168.16.101:8849?raft_port=8809                                                                                |
-| EMBEDDED_STORAGE                        | Use embedded storage in cluster mode without mysql                                                                                | `embedded` default : none                                                                                                                                                             |
-| NACOS_AUTH_CACHE_ENABLE                 | nacos.core.auth.caching.enabled                                                                                                   | default : false                                                                                                                                                                       |
-| NACOS_AUTH_USER_AGENT_AUTH_WHITE_ENABLE | nacos.core.auth.enable.userAgentAuthWhite                                                                                         | default : false                                                                                                                                                                       |
-| NACOS_AUTH_IDENTITY_KEY                 | nacos.core.auth.server.identity.key                                                                                               | `Note: It is removed from Nacos 2.2.1`                                                                                                                                                |
-| NACOS_AUTH_IDENTITY_VALUE               | nacos.core.auth.server.identity.value                                                                                             | `Note: It is removed from Nacos 2.2.1`                                                                                                                                                |
-| NACOS_SECURITY_IGNORE_URLS              | nacos.security.ignore.urls                                                                                                        | default : `/,/error,/**/*.css,/**/*.js,/**/*.html,/**/*.map,/**/*.svg,/**/*.png,/**/*.ico,/console-fe/public/**,/v1/auth/**,/v1/console/health/**,/actuator/**,/v1/console/server/**` |
-| NACOS_CONSOLE_UI_ENABLED                | nacos.console.ui.enabled                                                                                                          | default : `true`                                                                                                                                                                      |
-| NACOS_CORE_PARAM_CHECK_ENABLED          | nacos.core.param.check.enabled                                                                                                    | default : `true`                                                                                                                                                                      |
-| DB_POOL_CONNECTION_TIMEOUT               | Database connection pool timeout in milliseconds                                                                                 | default : **30000**                                                                                                                                                                   |
-
-
-## Advanced configuration
-
-~~If the above property configuration list does not meet your requirements, you can mount the `custom.properties` file
-into the `/home/nacos/init.d/` directory of the container, where the spring properties can be configured, and the
-priority is higher than `application.properties` file~~
-
-If you have a lot of custom configuration needs, It is highly recommended to mount `application.properties` in
-production environment.
-
-For example:
-
-```docker
-docker-compose -f example/custom-application-config.yaml up -d
+```yaml
+version: "3"
+services:
+  nacos:
+    image: yangxj96/nacos-service-pgsql:v2.3.2
+    container_name: nacos-pgsql
+    privileged: true
+    env_file:
+      - "/nacos/env/pgsql.env"
+    network_mode: host
+    volumes:
+      - "/nacos/logs/:/home/nacos/logs"
 ```
 
-## Nacos + Grafana + Prometheus
+#### pgsql.env
 
-Usage reference：[Nacos monitor-guide](https://nacos.io/zh-cn/docs/monitor-guide.html)
+```yaml
+MODE=standalone
+PREFER_HOST_MODE=hostname
+SPRING_DATASOURCE_PLATFORM=postgresql
+PGSQL_URL=jdbc:postgresql://localhost:5432/db?currentSchema=schema
+PGSQL_USERNAME=postgres
+PGSQL_PASSWORD=postgres
+```
 
-**Note**:  When Grafana creates a new data source, the data source address must be **http://prometheus:9090**
 
 
+## 三 常见问题
+
+- caused: Incorrect result size: expected 1, actual 2;
+
+目前发现这个问题应该是2.2.3版本的数据库有过改动,可以在[当前镜像构建脚本仓库链接](https://github.com/yangxj96/nacos-server-pgsql-docker)的schema文件夹下获取到pgsql的导入脚本,
+
+具体步骤为: 
+
+1. 在现有的nacos中把配置文件等内容导出,
+2. 清空nacos连接的数据库,
+3. 使用schema文件夹下的脚本进行初始化
+4. 导入配置文件等内容
+
+- No DataSource set
+
+> PREFER_HOST_MODE=hostname;
+
+需要设置为hostname,暂不清楚原因,在容器中会出现这个问题
+
+猜测可能是设置为ip之后,不做处理,
+
+不能用容器名或者ip访问到其他的容器或者主机的ip
+
+## 四 更新日志
+
+### v2.3.2
+
+> 升级nacos到2.3.2版本
+
+### ~~v2.3.0~~
+
+> 因打包后启动有分页的问题,但是查看插件源码后没找到问题,
+> nacos的代码没看懂(尴尬),等待官方解决或者数据库插件适配
+> 之后在打包
+
+- 更新nacos包到2.3.0版本
+
+### v2.2.3-dragonwell
+
+- 添加了以龙威11为java jdk的2.2.3版本
+- 下载命令 ```docker pull yangxj96/nacos-server-pgsql:v2.2.3-dragonwell```
+
+### v2.2.2-2
+
+> 之前下载后使用大概1.1GB左右,本次更新主要为缩小镜像大小
+
+- 切换基础镜像到```amazoncorretto:8u362-alpine3.17-jre```,大小只有150M左右
+- 优化一些操作,缩小包内容
+- 整体镜像缩减到278.7MB
+
+### v2.2.2-1
+
+- 修复docker 23.0.3 版本下无法运行
+- 添加 ```NACOS_AUTH_TOKEN,NACOS_AUTH_IDENTITY_KEY,NACOS_AUTH_IDENTITY_VALUE```的默认值(和官方默认值一样)
+
+
+### v2.2.2
+
+> 初始版本
