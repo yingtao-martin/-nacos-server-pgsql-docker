@@ -28,7 +28,7 @@ docker pull ghcr.io/yingtao-martin/nacos-server-pgsql-docker:v2.2.3
 
 数据库插件来自[官方收录的仓库中下载](https://github.com/nacos-group/nacos-plugin)
 
-[当前镜像构建脚本仓库链接](https://github.com/yangxj96/nacos-server-pgsql-docker)
+[当前镜像构建脚本仓库链接](https://github.com/yingtao-martin/nacos-server-pgsql-docker)
 
 ---
 
@@ -48,7 +48,7 @@ docker pull ghcr.io/yingtao-martin/nacos-server-pgsql-docker:v2.2.3
 version: "3"
 services:
   nacos:
-    image: yangxj96/nacos-service-pgsql:v2.3.2
+    image: yingtao-martin/nacos-service-pgsql:v2.2.3
     container_name: nacos-pgsql
     privileged: true
     env_file:
@@ -75,7 +75,7 @@ PGSQL_PASSWORD=postgres
 
 - caused: Incorrect result size: expected 1, actual 2;
 
-目前发现这个问题应该是2.2.3版本的数据库有过改动,可以在[当前镜像构建脚本仓库链接](https://github.com/yangxj96/nacos-server-pgsql-docker)的schema文件夹下获取到pgsql的导入脚本,
+目前发现这个问题应该是2.2.3版本的数据库有过改动,可以在[当前镜像构建脚本仓库链接](https://github.com/yingtao-martin/nacos-server-pgsql-docker)的schema文件夹下获取到pgsql的导入脚本,
 
 具体步骤为: 
 
