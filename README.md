@@ -5,13 +5,13 @@
 当前pull:
 
 ```shell
-docker pull yangxj96/nacos-server-pgsql:v2.3.2
+docker pull yingtao-martin/nacos-server-pgsql-docker:v2.2.3
 ```
 
 或
 
 ```shell
-docker pull ghcr.io/yangxj96/nacos-server-pgsql:v2.3.2
+docker pull ghcr.io/yingtao-martin/nacos-server-pgsql-docker:v2.2.3
 ```
 
 
@@ -93,40 +93,3 @@ PGSQL_PASSWORD=postgres
 猜测可能是设置为ip之后,不做处理,
 
 不能用容器名或者ip访问到其他的容器或者主机的ip
-
-## 四 更新日志
-
-### v2.3.2
-
-> 升级nacos到2.3.2版本
-
-### ~~v2.3.0~~
-
-> 因打包后启动有分页的问题,但是查看插件源码后没找到问题,
-> nacos的代码没看懂(尴尬),等待官方解决或者数据库插件适配
-> 之后在打包
-
-- 更新nacos包到2.3.0版本
-
-### v2.2.3-dragonwell
-
-- 添加了以龙威11为java jdk的2.2.3版本
-- 下载命令 ```docker pull yangxj96/nacos-server-pgsql:v2.2.3-dragonwell```
-
-### v2.2.2-2
-
-> 之前下载后使用大概1.1GB左右,本次更新主要为缩小镜像大小
-
-- 切换基础镜像到```amazoncorretto:8u362-alpine3.17-jre```,大小只有150M左右
-- 优化一些操作,缩小包内容
-- 整体镜像缩减到278.7MB
-
-### v2.2.2-1
-
-- 修复docker 23.0.3 版本下无法运行
-- 添加 ```NACOS_AUTH_TOKEN,NACOS_AUTH_IDENTITY_KEY,NACOS_AUTH_IDENTITY_VALUE```的默认值(和官方默认值一样)
-
-
-### v2.2.2
-
-> 初始版本
